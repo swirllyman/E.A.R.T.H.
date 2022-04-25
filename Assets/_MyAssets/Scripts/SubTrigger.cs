@@ -4,20 +4,18 @@ using UnityEngine;
 
 public class SubTrigger : MonoBehaviour
 {
-    public delegate void OnTriggerEnter(Collider other);
-    public delegate void OnTriggerExit(Collider other);
-    public event OnTriggerEnter onTriggerEnter;
-    public event OnTriggerExit onTriggerExit;
+    public delegate void Triggered2D(Collider2D other, bool entered);
+    public event Triggered2D onTrigger;
 
-    // Start is called before the first frame update
-    void Start()
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        
+        print("Sub Trigger Entered");
+        onTrigger?.Invoke(collision, true); 
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnTriggerExit2D(Collider2D collision)
     {
-        
+        print("Sub Trigger Exited");
+        onTrigger?.Invoke(collision, false);
     }
 }

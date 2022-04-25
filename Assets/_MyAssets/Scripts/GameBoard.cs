@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 public class GameBoard : MonoBehaviour
 {
+    public static GameBoard Instance { get; private set; }
     public GameObject overviewCam;
     public GameObject menuScreen;
     public TMP_Text currentResourcesText;
@@ -12,6 +13,7 @@ public class GameBoard : MonoBehaviour
     public Spinner spinner;
     public Player player;
     public BoardSquare[] boardSquares;
+    
 
     int currentTurn = 1;
     int maxResources;
@@ -34,6 +36,11 @@ public class GameBoard : MonoBehaviour
             else
                 prevWasChoice = false;
         }
+    }
+
+    private void Awake()
+    {
+        Instance = this;
     }
 
     private void Start()
@@ -71,12 +78,10 @@ public class GameBoard : MonoBehaviour
     {
         yield return new WaitForSeconds(waitTime);
         spinner.ShowSpinner();
-
         while (spinner.inUse)
         {
             yield return null;
         }
-
         player.PlayMoveSound();
         yield return new WaitForSeconds(.5f);
         spinner.HideSpinner();
@@ -95,7 +100,14 @@ public class GameBoard : MonoBehaviour
     {
         currentTurn++;
         turnText.text = "Turn: "+currentTurn.ToString();
-        StartCoroutine(WheelSpin());
+        if (currentResources > 0)
+        {
+            StartCoroutine(WheelSpin());
+        }
+        else
+        {
+            //Game Over Here
+        }
     }
 
     public void AddCurrentResources(int amount)
@@ -107,6 +119,14 @@ public class GameBoard : MonoBehaviour
     public void RemoveCurrentResources(int amount)
     {
         currentResources = Mathf.Clamp(currentResources - amount, 0, maxResources);
+        currentResourcesText.text = "Earth Resources: " + currentResources + "/" + maxResources;
+        spentResources += amount;
+        spentResourcesText.text = "Spent Resources: " + spentResources;
+    }
+
+    public void AddMaxResources(int amount)
+    {
+        maxResources += amount;
         currentResourcesText.text = "Earth Resources: " + currentResources + "/" + maxResources;
     }
 }

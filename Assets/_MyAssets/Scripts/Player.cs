@@ -5,7 +5,9 @@ using TMPro;
 using DG.Tweening;
 public class Player : MonoBehaviour
 {
+    public static Player Instance { get; private set; }
     internal bool upgradeReady = false;
+    [SerializeField] ChoiceManager choiceManager;
     [SerializeField] GameBoard board;
     [SerializeField] TMP_Text currentMovementText;
     [SerializeField] TMP_Text scoreFloaterText;
@@ -18,11 +20,13 @@ public class Player : MonoBehaviour
     int currentMoveDistance = 0;
     int currentSpaceID = -1;
     bool finishedWithSquare = false;
+    UpgradeArea currentUpgradeArea;
 
     private void Awake()
     {
         currentMovementText.text = "";
         scoreFloaterText.text = "";
+        Instance = this;
     }
 
     public void PlayMoveSound()
@@ -85,12 +89,10 @@ public class Player : MonoBehaviour
 
         if (upgradeReady)
         {
-            //TODO
-            //Upgrade Screen
+            currentUpgradeArea.ShowUpgradeScreen();
         }
         else
         {
-
             board.NextTurn();
         }
     }
@@ -101,15 +103,13 @@ public class Player : MonoBehaviour
         switch (board.boardSquares[currentSpaceID].mySquareType)
         {
             case SquareType.Renewable:
-                board.AddCurrentResources(3);
-                PlayScoreFloater(3, true);
+                AddScore(GameManager.renewableGain);
                 return 1.0f;
             case SquareType.FossilFuel:
-                board.RemoveCurrentResources(3);
-                PlayScoreFloater(3, false);
+                RemoveScore(GameManager.fossilFuelCost);
                 return 1.0f;
             case SquareType.Choice:
-                finishedWithSquare = true;
+                choiceManager.SetupRandomChoice();
                 return -1.0f;
             case SquareType.Challenge:
                 finishedWithSquare = true;
@@ -117,6 +117,23 @@ public class Player : MonoBehaviour
             default: 
                 return 1.0f;
         }
+    }
+
+    public void AddScore(int amount)
+    {
+        board.AddCurrentResources(amount);
+        PlayScoreFloater(amount, true);
+    }
+
+    public void RemoveScore(int amount)
+    {
+        board.RemoveCurrentResources(amount);
+        PlayScoreFloater(amount, false);
+    }
+
+    public void FinishedSquare()
+    {
+        finishedWithSquare = true;
     }
 
     void PlayScoreFloater(int score, bool positive)
@@ -144,5 +161,11 @@ public class Player : MonoBehaviour
     {
         yield return new WaitForSeconds(1.5f);
         scoreFloaterText.text = "";
+    }
+
+    public void SetUpgradeReady(UpgradeArea areaToUpgrade)
+    {
+        upgradeReady = true;
+        currentUpgradeArea = areaToUpgrade;
     }
 }

@@ -24,13 +24,14 @@ public class Spinner : MonoBehaviour
 
     [SerializeField] Color[] valueColors;
 
-
+    Player myPlayer;
     Vector3 startScale;
     bool spinning = false;
     int prevValue;
     // Start is called before the first frame update
     void Start()
     {
+        myPlayer = GetComponentInParent<Player>();
         startScale = currentScoreText.transform.localScale;
         pullArrowTransform.DOLocalMoveY(55, 1.0f).SetEase(Ease.InQuint).SetLoops(-1, LoopType.Yoyo);
         spinnerTitleTransform.DOScale(Vector3.one * .45f, 2.0f).SetLoops(-1, LoopType.Yoyo);
@@ -103,7 +104,6 @@ public class Spinner : MonoBehaviour
     public void Spin()
     {
         if (!pullLeverSlider.interactable) return;
-
         aSource.PlayOneShot(releaseClip);
         pullLeverSlider.interactable = false;
         spinning = true;
@@ -126,6 +126,15 @@ public class Spinner : MonoBehaviour
     {
         pullLeverSlider.interactable = true;
         spinningBody.constraints = RigidbodyConstraints2D.FreezePosition;
+    }
+
+    [Header("Debug")]
+    public int spacesToMove = 5;
+    [ContextMenu("OverrideSpin")]
+    public void OverrideSpin()
+    {
+        currentValue = spacesToMove;
+        SpinFinished();
     }
 
 }
