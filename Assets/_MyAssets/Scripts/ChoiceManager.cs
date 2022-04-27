@@ -22,6 +22,7 @@ public class ChoiceManager : MonoBehaviour
     public AudioSource aSource;
     public AudioClip correctClip;
     public AudioClip incorrectClip;
+    public AudioClip choiceActivatedClip;
 
     public Choice_SO[] choices;
     Choice_SO currentChoice;
@@ -39,6 +40,8 @@ public class ChoiceManager : MonoBehaviour
     public void SetupRandomChoice()
     {
         choiceUI.SetActive(true);
+        aSource.PlayOneShot(choiceActivatedClip);
+        GameManager.ToggleChocie(true);
         finishedChoiceButton.SetActive(false);
         isCorrect = false;
         trueButton.interactable = true;
@@ -63,7 +66,8 @@ public class ChoiceManager : MonoBehaviour
 
     public void AnswerChoice(bool clickedTrue)
     {
-        if(clickedTrue == currentChoice.isTrue)
+        GameManager.ToggleChocie(false);
+        if (clickedTrue == currentChoice.isTrue)
         {
             Correct();
         }
@@ -101,7 +105,7 @@ public class ChoiceManager : MonoBehaviour
 
     IEnumerator ChoiceFinishRoutine()
     {
-        yield return new WaitForSeconds(2.0f);
+        yield return new WaitForSeconds(1.0f);
         finishedChoiceButton.SetActive(true);
     }
 

@@ -9,13 +9,11 @@ public class SubTrigger : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        print("Sub Trigger Entered");
         onTrigger?.Invoke(collision, true); 
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        print("Sub Trigger Exited");
         onTrigger?.Invoke(collision, false);
     }
 }

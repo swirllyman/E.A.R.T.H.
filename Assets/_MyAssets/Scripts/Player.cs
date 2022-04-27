@@ -44,10 +44,18 @@ public class Player : MonoBehaviour
     IEnumerator MoveRoutine()
     {
         yield return new WaitForSeconds(1.0f);
+        bool wonGame = false;
         while(currentMoveDistance > 0)
         {
             currentMoveDistance--;
             currentSpaceID++;
+            
+            //Win State
+            if(currentSpaceID >= board.boardSquares.Length)
+            {
+                wonGame = true;
+                break;
+            }
             Vector3 startPos = transform.position;
             for (float i = 0; i < moveSpeed; i += Time.deltaTime)
             {
@@ -68,20 +76,27 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(.5f);
         currentMovementText.text = "";
 
-        float waitTime = GetSquareWaitTime();
-        if(waitTime < 0)
+        if (wonGame)
         {
-            while (!finishedWithSquare)
-            {
-                yield return null;
-            }
+            WinGame();
         }
         else
         {
-            yield return new WaitForSeconds(waitTime);
-        }
+            float waitTime = GetSquareWaitTime();
+            if (waitTime < 0)
+            {
+                while (!finishedWithSquare)
+                {
+                    yield return null;
+                }
+            }
+            else
+            {
+                yield return new WaitForSeconds(waitTime);
+            }
 
-        EndTurn();
+            EndTurn();
+        }
     }
 
     void EndTurn()
@@ -117,6 +132,11 @@ public class Player : MonoBehaviour
             default: 
                 return 1.0f;
         }
+    }
+
+    void WinGame()
+    {
+        board.WinGame();
     }
 
     public void AddScore(int amount)

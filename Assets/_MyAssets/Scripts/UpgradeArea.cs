@@ -3,21 +3,33 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class UpgradeArea : MonoBehaviour
 {
     public GameObject upgradeUI;
+    public GameObject vCam;
     public SubTrigger subTrigger;
     public SpriteRenderer myRend;
     public Upgrade_SO[] options;
     public UpgradeOption[] optionUI;
+    public Color upgradeColor;
+    public ParticleSystem[] fadeParticles;
+    public ParticleSystem finishParticles;
+    public SpriteRenderer checkPointRend;
+    public GameObject upgradeReadyUiObject;
+    public AudioSource aSource;
+    public AudioClip buildClip;
+    public AudioClip buildFinishClip;
 
     Upgrade_SO selectedUpgrade;
     // Start is called before the first frame update
     void Awake()
     {
         upgradeUI.SetActive(false);
+        upgradeReadyUiObject.SetActive(false);
         subTrigger.onTrigger += OnSubTrigger;
+        upgradeReadyUiObject.transform.DOScale(upgradeReadyUiObject.transform.localScale * 1.05f, 1.5f).SetLoops(-1);
     }
 
     private void OnSubTrigger(Collider2D other, bool entered)
@@ -27,6 +39,13 @@ public class UpgradeArea : MonoBehaviour
             if (other.transform.CompareTag("Player"))
             {
                 other.GetComponent<Player>().SetUpgradeReady(this);
+                upgradeReadyUiObject.SetActive(true);
+                checkPointRend.enabled = false;
+                foreach(ParticleSystem p in fadeParticles)
+                {
+                    p.Play();
+                }
+                aSource.Play();
             }
         }
     }
@@ -35,12 +54,16 @@ public class UpgradeArea : MonoBehaviour
     {
         selectedUpgrade = options[upgradeID];
         myRend.sprite = selectedUpgrade.upgradeSprite;
+        myRend.enabled = false;
+        aSource.PlayOneShot(buildClip);
         UseUpgrade();
     }
 
     public void ShowUpgradeScreen()
     {
+        upgradeReadyUiObject.SetActive(false);
         upgradeUI.SetActive(true);
+        vCam.SetActive(true);
         for (int i = 0; i < options.Length; i++)
         {
             optionUI[i].headerText.text = options[i].upgradeName;
@@ -57,13 +80,25 @@ public class UpgradeArea : MonoBehaviour
                 GameBoard.Instance.AddMaxResources(10);
                 break;
             case "Wind Power":
-                GameManager.renewableGain = 4;
+                GameManager.renewableGain++;
                 break;
             case "Coal Upgrade":
-                GameManager.fossilFuelCost = 2;
+                GameManager.fossilFuelCost--;
                 break;
         }
         upgradeUI.SetActive(false);
+        finishParticles.Play();
+        StartCoroutine(UpgradeRoutine());
+    }
+
+    IEnumerator UpgradeRoutine()
+    {
+        yield return new WaitForSeconds(2.5f);
+        myRend.enabled = true;
+        aSource.PlayOneShot(buildFinishClip);
+        yield return new WaitForSeconds(2.0f);
+        vCam.SetActive(false);
+        yield return new WaitForSeconds(1.0f);
         Player.Instance.upgradeReady = false;
         GameBoard.Instance.NextTurn();
     }

@@ -2,11 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
+
 public class GameBoard : MonoBehaviour
 {
     public static GameBoard Instance { get; private set; }
     public GameObject overviewCam;
     public GameObject menuScreen;
+    public GameObject gameOverScreen;
     public TMP_Text currentResourcesText;
     public TMP_Text spentResourcesText;
     public TMP_Text turnText;
@@ -38,9 +41,20 @@ public class GameBoard : MonoBehaviour
         }
     }
 
+    public void Replay()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
     private void Awake()
     {
         Instance = this;
+        menuScreen.SetActive(true);
+    }
+
+    private void OnDestroy()
+    {
+        Instance = null;
     }
 
     private void Start()
@@ -106,7 +120,9 @@ public class GameBoard : MonoBehaviour
         }
         else
         {
+            //Fail State
             //Game Over Here
+            
         }
     }
 
@@ -128,5 +144,15 @@ public class GameBoard : MonoBehaviour
     {
         maxResources += amount;
         currentResourcesText.text = "Earth Resources: " + currentResources + "/" + maxResources;
+    }
+
+    public void WinGame()
+    {
+        gameOverScreen.SetActive(true);
+    }
+
+    public void LoseGame()
+    {
+        gameOverScreen.SetActive(true);
     }
 }
