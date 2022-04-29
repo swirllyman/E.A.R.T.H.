@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     public static int fossilFuelCost = 3;
     public static int renewableGain = 3;
 
+    public GameObject[] uiPanels;
     public AudioSource gameMusicAudioSource;
     public AudioClip gameMusicClip;
     public AudioClip gameChoiceClip;
@@ -37,4 +38,21 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void SelectPanel(int uiPanel)
+    {
+        for (int i = 0; i < uiPanels.Length; i++)
+        {
+            uiPanels[i].SetActive(i == uiPanel);
+        }
+    }
+
+    public void RestartGame()
+    {
+
+    }
+
+    public void ExitGame()
+    {
+        Application.Quit();
+    }
 }
