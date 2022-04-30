@@ -9,14 +9,15 @@ public class GameBoard : MonoBehaviour
     public static GameBoard Instance { get; private set; }
     public GameObject overviewCam;
     public GameObject menuScreen;
-    public GameObject gameOverScreen;
+    public GameOverUI gameOverUI;
     public TMP_Text currentResourcesText;
     public TMP_Text spentResourcesText;
     public TMP_Text turnText;
     public Spinner spinner;
     public Player player;
     public BoardSquare[] boardSquares;
-    
+
+    internal bool won = false;
 
     int currentTurn = 1;
     int maxResources;
@@ -50,6 +51,7 @@ public class GameBoard : MonoBehaviour
     {
         Instance = this;
         menuScreen.SetActive(true);
+        gameOverUI.SetupGameOverUI();
     }
 
     private void OnDestroy()
@@ -66,6 +68,7 @@ public class GameBoard : MonoBehaviour
     public void StartNewGameDefault()
     {
         menuScreen.SetActive(false);
+        FindObjectOfType<SoundOptions>().optionsButton.SetActive(true);
         GameManager.difficulty = 1;
         SelectCharacter();
 
@@ -120,9 +123,7 @@ public class GameBoard : MonoBehaviour
         }
         else
         {
-            //Fail State
-            //Game Over Here
-            
+            LoseGame();
         }
     }
 
@@ -148,11 +149,85 @@ public class GameBoard : MonoBehaviour
 
     public void WinGame()
     {
-        gameOverScreen.SetActive(true);
+        StartCoroutine(ScoreRecapRoutine());
     }
 
     public void LoseGame()
     {
-        gameOverScreen.SetActive(true);
+        StartCoroutine(ScoreRecapRoutine());
+    }
+
+    IEnumerator ScoreRecapRoutine()
+    {
+        gameOverUI.endOfGameScreen.SetActive(true);
+        yield return new WaitForSeconds(1.0f);
+        gameOverUI.scoreRecap.SetActive(true);
+        gameOverUI.earthResourcesText.text = currentResources.ToString();
+        yield return new WaitForSeconds(1.0f);
+        gameOverUI.spentText.text = spentResources.ToString();
+        yield return new WaitForSeconds(1.0f);
+        gameOverUI.turnsText.text = currentTurn.ToString();
+        yield return new WaitForSeconds(1.0f);
+
+        int totalScore = currentResources - spentResources - currentTurn;
+        won = totalScore >= 0;
+        string colorScore = won ? "<color=green>" + totalScore + "</color>" : "<color=red>" + totalScore + "</color>";
+        gameOverUI.totalScoreText.text = colorScore;
+
+        yield return new WaitForSeconds(.5f);
+        gameOverUI.nextButtonObject.SetActive(true);
+    }
+
+    public void ShowGameOverText()
+    {
+        StartCoroutine(GameOverRoutine());
+    }
+
+    IEnumerator GameOverRoutine()
+    {
+        gameOverUI.scoreRecap.SetActive(false);
+        gameOverUI.gameEndedScreen.SetActive(true);
+
+        if (won)
+        {
+            gameOverUI.winText.SetActive(true);
+        }
+        else
+        {
+            gameOverUI.lostText.SetActive(true);
+        }
+        yield return new WaitForSeconds(1.0f);
+        gameOverUI.replayButtonObject.SetActive(true);
+    }
+}
+
+[System.Serializable]
+public class GameOverUI
+{
+    public GameObject endOfGameScreen;
+    public GameObject scoreRecap;
+    public GameObject gameEndedScreen;
+    public GameObject lostText;
+    public GameObject winText;
+    public GameObject replayButtonObject;
+    public GameObject nextButtonObject;
+
+    public TMP_Text earthResourcesText;
+    public TMP_Text spentText;
+    public TMP_Text turnsText;
+    public TMP_Text totalScoreText;
+
+    public void SetupGameOverUI()
+    {
+        endOfGameScreen.SetActive(false);
+        lostText.SetActive(false);
+        winText.SetActive(false);
+        replayButtonObject.SetActive(false);
+        gameEndedScreen.SetActive(false);
+        nextButtonObject.SetActive(false);
+        earthResourcesText.text = "";
+        spentText.text = "";
+        turnsText.text = "";
+        totalScoreText.text = "";
     }
 }
