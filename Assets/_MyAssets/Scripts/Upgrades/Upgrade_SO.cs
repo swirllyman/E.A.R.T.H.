@@ -7,4 +7,5 @@ public class Upgrade_SO : ScriptableObject
     [TextArea(3, 5)]
     public string upgradeDescription;
     public Sprite upgradeSprite;
+    public int upgradeCost = 0;
 }

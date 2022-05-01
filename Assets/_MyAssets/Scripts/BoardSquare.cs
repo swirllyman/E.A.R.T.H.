@@ -11,6 +11,23 @@ public class BoardSquare : MonoBehaviour
 
     [SerializeField] SpriteRenderer myRend;
 
+    private void Awake()
+    {
+        mySquareType = (SquareType)GetSquareType();
+    }
+
+    int GetSquareType()
+    {
+        for (int i = 0; i < squareIcons.Length; i++)
+        {
+            if(myRend.sprite == squareIcons[i].iconSprite)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     internal void SetSquareType(int iconID)
     {
         myRend.sprite = squareIcons[iconID].iconSprite;

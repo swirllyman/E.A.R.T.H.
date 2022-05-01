@@ -42,15 +42,15 @@ public class Spinner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            ShowSpinner();
-        }
+        //if (Input.GetKeyDown(KeyCode.Space))
+        //{
+        //    ShowSpinner();
+        //}
 
-        if (Input.GetKeyDown(KeyCode.LeftControl))
-        {
-            HideSpinner();
-        }
+        //if (Input.GetKeyDown(KeyCode.LeftControl))
+        //{
+        //    HideSpinner();
+        //}
 
         if (spinning)
         {

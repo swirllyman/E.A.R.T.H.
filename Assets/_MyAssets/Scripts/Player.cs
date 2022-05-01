@@ -21,6 +21,7 @@ public class Player : MonoBehaviour
     int currentSpaceID = -1;
     bool finishedWithSquare = false;
     UpgradeArea currentUpgradeArea;
+    BoardSquare currentSquare;
 
     private void Awake()
     {
@@ -51,8 +52,9 @@ public class Player : MonoBehaviour
             currentSpaceID++;
             
             //Win State
-            if(currentSpaceID >= board.boardSquares.Length)
+            if(currentSpaceID >= board.boardSquares[GameManager.difficulty].boardSquares.Length)
             {
+                GameBoard.Instance.PlayGameFinished();
                 wonGame = true;
                 break;
             }
@@ -60,11 +62,18 @@ public class Player : MonoBehaviour
             for (float i = 0; i < moveSpeed; i += Time.deltaTime)
             {
                 float perc = i / moveSpeed;
-                transform.position = Vector3.Lerp(startPos, board.boardSquares[currentSpaceID].transform.position, perc);
+                transform.position = Vector3.Lerp(startPos, board.boardSquares[GameManager.difficulty].boardSquares[currentSpaceID].transform.position, perc);
                 yield return null;
             }
+            if(currentSquare != null)
+            {
+                currentSquare.transform.DOScale(.8f, .25f);
+            }
+
+            currentSquare = board.boardSquares[GameManager.difficulty].boardSquares[currentSpaceID];
             currentMovementText.text = currentMoveDistance.ToString();
-            transform.position = board.boardSquares[currentSpaceID].transform.position;
+            transform.position = board.boardSquares[GameManager.difficulty].boardSquares[currentSpaceID].transform.position;
+            currentSquare.transform.DOScale(1.5f, .25f);
 
             aSource.Play();
             if (currentMoveDistance > 0)
@@ -115,7 +124,7 @@ public class Player : MonoBehaviour
     float GetSquareWaitTime()
     {
         finishedWithSquare = false;
-        switch (board.boardSquares[currentSpaceID].mySquareType)
+        switch (board.boardSquares[GameManager.difficulty].boardSquares[currentSpaceID].mySquareType)
         {
             case SquareType.Renewable:
                 AddScore(GameManager.renewableGain);

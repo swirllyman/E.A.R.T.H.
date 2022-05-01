@@ -7,7 +7,6 @@ using UnityEngine.Audio;
 public class SoundOptions : MonoBehaviour
 {
     public GameObject optionsUIObject;
-    public GameObject optionsButton;
     [Header("Sound Options")]
     [SerializeField] AudioMixer mainMixer;
     [SerializeField] SliderOption[] sliders;
@@ -15,7 +14,6 @@ public class SoundOptions : MonoBehaviour
     private void Start()
     {
         optionsUIObject.SetActive(false);
-        optionsButton.SetActive(false);
         for (int i = 0; i < sliders.Length; i++)
         {
             if (!PlayerPrefs.HasKey(sliders[i].paramName))
@@ -38,7 +36,6 @@ public class SoundOptions : MonoBehaviour
     public void ToggleMenu()
     {
         optionsUIObject.SetActive(!optionsUIObject.activeInHierarchy);
-        optionsButton.SetActive(!optionsUIObject.activeInHierarchy);
         Time.timeScale = optionsUIObject.activeInHierarchy ? 0.0f : 1.0f;
         if (optionsUIObject.activeInHierarchy)
         {
